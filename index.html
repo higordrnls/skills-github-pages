@@ -13,7 +13,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ===== PRIMEIRA TELA (imutável) ===== */
+/* ===== BASE ORIGINAL ===== */
 
 .hero {
   display: flex;
@@ -35,44 +35,28 @@ p {
   opacity: 0.6;
 }
 
-/* ===== NOVA SEÇÃO ADICIONADA ===== */
+/* ===== NOVA SEÇÃO LIMPA ===== */
 
-.archive-preview {
+.next {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  opacity: 0.3;
-  font-size: 28px;
-  letter-spacing: 1px;
-  line-height: 60px;
-}
-
-.enter {
-  position: absolute;
-  bottom: 40px;
-  font-size: 14px;
-  opacity: 0.4;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SUA BASE ORIGINAL -->
+<!-- PRIMEIRA TELA (imutável) -->
 <section class="hero">
   <h1>ArchiveOne</h1>
   <p>Everything you've ever been.</p>
 </section>
 
-<!-- ADIÇÃO -->
-<section class="archive-preview">
-  films<br>
-  music<br>
-  books<br>
-  videos
-  <div class="enter">enter archive</div>
+<!-- SEGUNDA TELA -->
+<section class="next">
+  <p>enter archive</p>
 </section>
 
 </body>
