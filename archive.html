@@ -112,12 +112,13 @@ function salvar() {
   const notes = document.getElementById("notes").value;
 
   const novoItem = {
-    title,
-    category,
-    date,
-    rating,
-    notes
-  };
+  id: Date.now(),
+  title,
+  category,
+  date,
+  rating,
+  notes
+};
 
   let dados = JSON.parse(localStorage.getItem("archive")) || [];
 
