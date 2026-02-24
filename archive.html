@@ -22,7 +22,6 @@
 
   h2 {
     font-weight: 400;
-    letter-spacing: 1px;
   }
 
   input, select, textarea {
@@ -30,7 +29,6 @@
     border: 1px solid #333;
     color: #f5f5f5;
     padding: 10px;
-    font-size: 14px;
   }
 
   button {
@@ -39,11 +37,6 @@
     color: #f5f5f5;
     padding: 10px;
     cursor: pointer;
-    transition: opacity 0.3s ease;
-  }
-
-  button:hover {
-    opacity: 0.7;
   }
 </style>
 </head>
@@ -53,9 +46,9 @@
 <div class="container">
   <h2>New Entry</h2>
 
-  <input type="text" placeholder="Title">
+  <input id="title" type="text" placeholder="Title">
 
-  <select>
+  <select id="category">
     <option>Articles</option>
     <option>Books</option>
     <option>Interviews</option>
@@ -66,14 +59,46 @@
     <option>TV Shows</option>
   </select>
 
-  <input type="date">
+  <input id="date" type="date">
 
-  <input type="number" placeholder="Rating (1-5)" min="1" max="5">
+  <input id="rating" type="number" placeholder="Rating (1-5)" min="1" max="5">
 
-  <textarea placeholder="Notes"></textarea>
+  <textarea id="notes" placeholder="Notes"></textarea>
 
-  <button>Add to Archive</button>
+  <button onclick="salvar()">Add to Archive</button>
 </div>
+
+<script>
+function salvar() {
+  const title = document.getElementById("title").value;
+  const category = document.getElementById("category").value;
+  const date = document.getElementById("date").value;
+  const rating = document.getElementById("rating").value;
+  const notes = document.getElementById("notes").value;
+
+  const novoItem = {
+    title,
+    category,
+    date,
+    rating,
+    notes
+  };
+
+  let dados = JSON.parse(localStorage.getItem("archive")) || [];
+
+  dados.push(novoItem);
+
+  localStorage.setItem("archive", JSON.stringify(dados));
+
+  alert("Salvo com sucesso");
+
+  // limpa campos
+  document.getElementById("title").value = "";
+  document.getElementById("date").value = "";
+  document.getElementById("rating").value = "";
+  document.getElementById("notes").value = "";
+}
+</script>
 
 </body>
 </html>
