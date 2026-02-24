@@ -1,1 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Podcasts | ArchiveOne</title>
 
+<style>
+  body {
+    margin: 0;
+    background-color: #0a0a0a;
+    color: #f5f5f5;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 100px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .entry {
+    border-left: 1px solid #444;
+    padding-left: 15px;
+    opacity: 0.8;
+  }
+
+  .date {
+    font-size: 12px;
+    opacity: 0.5;
+  }
+
+  .back {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    font-size: 16px;
+    opacity: 0.6;
+    color: #f5f5f5;
+    text-decoration: none;
+  }
+</style>
+</head>
+
+<body>
+
+<a href="index.html" class="back">back</a>
+
+<div class="container" id="timeline">
+  <h2>Podcasts</h2>
+</div>
+
+<script>
+const dados = JSON.parse(localStorage.getItem("archive")) || [];
+
+const podcasts = dados
+  .filter(item => item.category === "Podcasts")
+  .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+const timeline = document.getElementById("timeline");
+
+podcasts.forEach(item => {
+  const div = document.createElement("div");
+  div.classList.add("entry");
+
+  div.innerHTML = `
+    <div class="date">${item.date}</div>
+    <div>${item.title}</div>
+  `;
+
+  timeline.appendChild(div);
+});
+</script>
+
+</body>
+</html>
