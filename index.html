@@ -5,93 +5,81 @@
   <title>ArchiveOne</title>
 
   <style>
-    body {
-      margin: 0;
-      background-color: #0a0a0a;
-      color: #f5f5f5;
-      font-family: Arial, Helvetica, sans-serif;
-      height: 100vh;
-    }
+<style>
+  body {
+    margin: 0;
+    background-color: #0a0a0a;
+    color: #f5f5f5;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100vh;
+  }
 
-    /* ===== MENU ===== */
-.menu {
-  position: absolute;
-  top: 30px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 60px; /* mais espaçamento */
-}
+  /* ===== MENU ===== */
+  .menu {
+    position: absolute;
+    top: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+  }
 
-.menu a {
-  font-size: 14px;
-  opacity: 0.65; /* mais visível */
-  color: #f5f5f5;
-  text-decoration: none;
-  letter-spacing: 1px; /* mais respiro */
-  transition: opacity 0.3s ease;
-}
+  .menu a {
+    text-decoration: none;
+  }
 
-.menu a:hover {
-  opacity: 1;
-}
-    /* ===== CONTEÚDO CENTRAL ===== */
-    .container {
-      text-align: center;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
+  /* ===== CONTEÚDO CENTRAL ===== */
+  .container {
+    text-align: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
 
-    h1 {
-      font-size: 48px;
-      letter-spacing: 2px;
-      margin-bottom: 10px;
-    }
+  h1 {
+    font-size: 48px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
 
-    p {
-      font-size: 16px;
-      opacity: 0.6;
-      margin: 0;
-    }
+  /* 🔥 TODA TIPOGRAFIA SECUNDÁRIA PADRONIZADA */
+  .secondary-text {
+    font-size: 16px;
+    opacity: 0.6;
+    color: #f5f5f5;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
 
-    .enter-link {
-      font-size: 16px;
-      opacity: 0.6;
-      color: #f5f5f5;
-      text-decoration: none;
-      margin-top: 20px;
-      display: inline-block;
-      transition: opacity 0.3s ease;
-    }
-
-    .enter-link:hover {
-      opacity: 1;
-    }
+  .secondary-text:hover {
+    opacity: 1;
+  }
+</style>
   </style>
 </head>
 
 <body>
 
   <!-- MENU SUPERIOR -->
-  <nav class="menu">
-  <a href="articles.html">Articles</a>
-  <a href="books.html">Books</a>
-  <a href="interviews.html">Interviews</a>
-  <a href="movies.html">Movies</a>
-  <a href="podcasts.html">Podcasts</a>
-  <a href="series.html">Series</a>
-  <a href="songs.html">Songs</a>
-  <a href="tvshows.html">TV Shows</a>
+ <nav class="menu">
+  <a href="articles.html" class="secondary-text">Articles</a>
+  <a href="books.html" class="secondary-text">Books</a>
+  <a href="interviews.html" class="secondary-text">Interviews</a>
+  <a href="movies.html" class="secondary-text">Movies</a>
+  <a href="podcasts.html" class="secondary-text">Podcasts</a>
+  <a href="series.html" class="secondary-text">Series</a>
+  <a href="songs.html" class="secondary-text">Songs</a>
+  <a href="tvshows.html" class="secondary-text">TV Shows</a>
 </nav>
 
   <!-- CONTEÚDO CENTRAL -->
   <div class="container">
     <h1>ArchiveOne</h1>
-    <p>Everything you've ever been.</p>
-    <a href="archive.html" class="enter-link">enter archive</a>
+    <p class="secondary-text">Everything you've ever been.</p>
+<a href="archive.html" class="secondary-text">enter archive</a>
   </div>
 
 </body>
