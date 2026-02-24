@@ -65,12 +65,23 @@ podcasts.forEach(item => {
   div.classList.add("entry");
 
   div.innerHTML = `
-    <div class="date">${item.date}</div>
-    <div>${item.title}</div>
-  `;
+  <div class="date">${item.date}</div>
+  <div>${item.title}</div>
+  <button onclick="excluir(${item.id})">delete</button>
+`;
 
   timeline.appendChild(div);
 });
+
+  function excluir(id) {
+  let dados = JSON.parse(localStorage.getItem("archive")) || [];
+
+  dados = dados.filter(item => item.id !== id);
+
+  localStorage.setItem("archive", JSON.stringify(dados));
+
+  location.reload(); // atualiza a página
+}
 </script>
 
 </body>
