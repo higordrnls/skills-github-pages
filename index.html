@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>ArchiveOne</title>
@@ -7,64 +7,71 @@
 <style>
 body {
   margin: 0;
-  background: #f7f7f5;
-  color: #111;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  background-color: #0a0a0a;
+  color: #f5f5f5;
+  font-family: Arial, Helvetica, sans-serif;
   overflow-x: hidden;
 }
 
-section {
-  height: 100vh;
+/* ===== PRIMEIRA TELA (imutável) ===== */
+
+.hero {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
   flex-direction: column;
 }
 
 h1 {
   font-size: 48px;
-  font-weight: 400;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
 }
 
-.subtitle {
-  font-size: 14px;
-  opacity: 0.5;
-  margin-top: 10px;
+p {
+  font-size: 16px;
+  opacity: 0.6;
 }
 
-.words {
-  font-size: 28px;
+/* ===== NOVA SEÇÃO ADICIONADA ===== */
+
+.archive-preview {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   opacity: 0.3;
+  font-size: 28px;
+  letter-spacing: 1px;
   line-height: 60px;
 }
 
 .enter {
-  font-size: 14px;
-  opacity: 0.4;
   position: absolute;
   bottom: 40px;
+  font-size: 14px;
+  opacity: 0.4;
 }
 </style>
 </head>
 
 <body>
 
-<section>
+<!-- SUA BASE ORIGINAL -->
+<section class="hero">
   <h1>ArchiveOne</h1>
-  <div class="subtitle">archive of what was lived</div>
+  <p>Everything you've ever been.</p>
 </section>
 
-<section>
-  <div class="words">
-    films<br>
-    music<br>
-    books<br>
-    videos
-  </div>
-</section>
-
-<section>
+<!-- ADIÇÃO -->
+<section class="archive-preview">
+  films<br>
+  music<br>
+  books<br>
+  videos
   <div class="enter">enter archive</div>
 </section>
 
