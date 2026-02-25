@@ -21,9 +21,16 @@
   }
 
   .entry {
+    position: relative;
     border-left: 1px solid #444;
-    padding-left: 15px;
+    padding: 15px;
     opacity: 0.8;
+    cursor: pointer; /* Indica que é clicável para editar */
+    transition: background 0.3s ease;
+  }
+
+  .entry:hover {
+    background: #1a1a1a;
   }
 
   .date {
@@ -31,89 +38,71 @@
     opacity: 0.5;
   }
 
-  .back {
+  .delete-btn {
     position: absolute;
-    bottom: 30px;
-    left: 30px;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #f5f5f5;
+    font-size: 18px;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    z-index: 10; /* Garante que o botão fique acima do card */
+  }
+
+  .entry:hover .delete-btn {
+    opacity: 0.6;
+  }
+
+  .delete-btn:hover {
+    opacity: 1 !important;
+    color: #ff4444;
+  }
+
+  .title {
+    font-size: 18px;
+    margin-top: 5px;
+    font-weight: bold;
+  }
+
+  .meta {
+    font-size: 13px;
+    opacity: 0.6;
+    margin-top: 4px;
+  }
+
+  .notes {
+    font-size: 14px;
+    opacity: 0.7;
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  .secondary-text {
     font-size: 16px;
     opacity: 0.6;
     color: #f5f5f5;
+    letter-spacing: 0.5px;
     text-decoration: none;
+    transition: opacity 0.3s ease;
   }
- /* 🔥 BOTÃO BACK */
+
+  .secondary-text:hover {
+    opacity: 1;
+  }
+
   .back-button {
-    position: absolute;
+    position: fixed; /* Mudei para fixed para garantir visibilidade */
     bottom: 30px;
     left: 30px;
   }
-  .entry {
-  position: relative;
-  border-left: 1px solid #444;
-  padding: 15px 15px 15px 15px;
-  opacity: 0.8;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  color: #f5f5f5;
-  font-size: 14px;
-  opacity: 0;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-}
-
-.entry:hover .delete-btn {
-  opacity: 0.6;
-}
-
-.delete-btn:hover {
-  opacity: 1 !important;
-}
-.title {
-  font-size: 18px;
-  margin-top: 5px;
-}
-
-.meta {
-  font-size: 13px;
-  opacity: 0.6;
-  margin-top: 4px;
-}
-
-.notes {
-  font-size: 14px;
-  opacity: 0.7;
-  margin-top: 8px;
-  line-height: 1.4;
-}
-.secondary-text {
-  font-size: 16px;
-  opacity: 0.6;
-  color: #f5f5f5;
-  letter-spacing: 0.5px;
-  text-decoration: none;
-  transition: opacity 0.3s ease;
-}
-
-.secondary-text:hover {
-  opacity: 1;
-}
-
-.back-button {
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-}
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 BOTÃO BACK (AGORA NO LUGAR CERTO) -->
 <a href="index.html" class="secondary-text back-button">← Back</a>
 
 <div class="container" id="timeline">
@@ -121,8 +110,27 @@
 </div>
 
 <script>
-const dados = JSON.parse(localStorage.getItem("archive")) || [];
+// 1. Funções Auxiliares (Fora do Loop)
+function linkify(text) {
+  if (!text) return "";
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.replace(urlRegex, function(url) {
+    return `<a href="${url}" target="_blank" style="color:#f5f5f5; text-decoration: underline;">${url}</a>`;
+  });
+}
 
+function excluir(event, id) {
+  event.stopPropagation(); // Impede que o clique no "X" abra a edição
+  if (confirm("Deseja realmente excluir este registro?")) {
+    let dados = JSON.parse(localStorage.getItem("archive")) || [];
+    dados = dados.filter(item => item.id !== id);
+    localStorage.setItem("archive", JSON.stringify(dados));
+    location.reload();
+  }
+}
+
+// 2. Renderização
+const dados = JSON.parse(localStorage.getItem("archive")) || [];
 const podcasts = dados
   .filter(item => item.category === "Podcasts")
   .sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -132,104 +140,23 @@ const timeline = document.getElementById("timeline");
 podcasts.forEach(item => {
   const div = document.createElement("div");
   div.classList.add("entry");
- div.onclick = () => {
-  localStorage.setItem("editando", item.id);
-  window.location.href = "archive.html";
-};
+  
+  // Ao clicar no card, vai para a página de edição
+  div.onclick = () => {
+    localStorage.setItem("editando", item.id);
+    window.location.href = "archive.html";
+  };
 
   div.innerHTML = `
-  <button class="delete-btn" onclick="excluir(${item.id})">×</button>
-
-  <div class="date">${item.date || ""}</div>
-
-  <div class="title">${item.title || ""}</div>
-
-  ${item.rating ? `<div class="meta">Rating: ${item.rating}/5</div>` : ""}
-
-  ${item.notes ? `<div class="notes">${linkify(item.notes)}</div>` : ""}
-
-  function linkify(text) {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  return text.replace(urlRegex, function(url) {
-    return `<a href="${url}" target="_blank" style="color:#f5f5f5; opacity:0.7;">${url}</a>`;
-  });
-}
-`;
+    <button class="delete-btn" onclick="excluir(event, ${item.id})">×</button>
+    <div class="date">${item.date || ""}</div>
+    <div class="title">${item.title || "Sem título"}</div>
+    ${item.rating ? `<div class="meta">Rating: ${item.rating}/5</div>` : ""}
+    ${item.notes ? `<div class="notes">${linkify(item.notes)}</div>` : ""}
+  `;
 
   timeline.appendChild(div);
 });
-
-  function excluir(id) {
-  let dados = JSON.parse(localStorage.getItem("archive")) || [];
-
-  dados = dados.filter(item => item.id !== id);
-
-  localStorage.setItem("archive", JSON.stringify(dados));
-
-  location.reload(); // atualiza a página
-}
-  function editar(id) {
-  let dados = JSON.parse(localStorage.getItem("archive")) || [];
-  const item = dados.find(i => i.id === id);
-
-  const novoTitulo = prompt("Edit title:", item.title);
-  const novaData = prompt("Edit date:", item.date);
-  const novoRating = prompt("Edit rating:", item.rating);
-  const novoNotes = prompt("Edit notes:", item.notes);
-
-  if (novoTitulo !== null) item.title = novoTitulo;
-  if (novaData !== null) item.date = novaData;
-  if (novoRating !== null) item.rating = novoRating;
-  if (novoNotes !== null) item.notes = novoNotes;
-
-  localStorage.setItem("archive", JSON.stringify(dados));
-
-  location.reload();
-}
-  function salvar() {
-  const title = document.getElementById("title").value;
-  const category = document.getElementById("category").value;
-  const date = document.getElementById("date").value;
-  const rating = document.getElementById("rating").value;
-  const notes = document.getElementById("notes").value;
-
-  let dados = JSON.parse(localStorage.getItem("archive")) || [];
-
-  const editandoId = localStorage.getItem("editando");
-
-  if (editandoId) {
-    // EDITAR
-    const item = dados.find(i => i.id == editandoId);
-
-    item.title = title;
-    item.category = category;
-    item.date = date;
-    item.rating = rating;
-    item.notes = notes;
-
-    localStorage.removeItem("editando");
-
-  } else {
-    // NOVO
-    const novoItem = {
-      id: Date.now(),
-      title,
-      category,
-      date,
-      rating,
-      notes
-    };
-
-    dados.push(novoItem);
-  }
-
-  localStorage.setItem("archive", JSON.stringify(dados));
-
-  alert("Salvo com sucesso");
-
-  location.href = category.toLowerCase().replace(" ", "") + ".html";
-}
-
 </script>
 
 </body>
