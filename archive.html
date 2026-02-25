@@ -157,9 +157,15 @@ function salvar() {
     dados.push(novoItem);
   }
 
-  localStorage.setItem("archive", JSON.stringify(dados));
+localStorage.setItem("archive", JSON.stringify(dados));
 
   alert("Saved successfully!");
+
+  // Se a categoria for Podcast, volta para podcasts.html
+  // Caso contrário, segue a regra geral de transformar o nome da categoria no link
+  let destination = category.toLowerCase().replace(/\s/g, "") + ".html";
+  
+  window.location.href = destination;
 
   // Redireciona para a página da categoria (ex: podcasts.html)
   const targetPage = category.toLowerCase().replace(" ", "") + ".html";
