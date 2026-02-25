@@ -90,12 +90,30 @@
   margin-top: 8px;
   line-height: 1.4;
 }
+.secondary-text {
+  font-size: 16px;
+  opacity: 0.6;
+  color: #f5f5f5;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.secondary-text:hover {
+  opacity: 1;
+}
+
+.back-button {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+}
 </style>
 </head>
 
 <body>
 
-<a href="index.html" class="back">back</a>
+<a href="index.html" class="secondary-text back-button">back</a>
 
 <div class="container" id="timeline">
   <h2>Podcasts</h2>
@@ -113,6 +131,7 @@ const timeline = document.getElementById("timeline");
 podcasts.forEach(item => {
   const div = document.createElement("div");
   div.classList.add("entry");
+  div.onclick = () => editar(item.id);
 
   div.innerHTML = `
   <button class="delete-btn" onclick="excluir(${item.id})">×</button>
@@ -137,6 +156,24 @@ podcasts.forEach(item => {
   localStorage.setItem("archive", JSON.stringify(dados));
 
   location.reload(); // atualiza a página
+}
+  function editar(id) {
+  let dados = JSON.parse(localStorage.getItem("archive")) || [];
+  const item = dados.find(i => i.id === id);
+
+  const novoTitulo = prompt("Edit title:", item.title);
+  const novaData = prompt("Edit date:", item.date);
+  const novoRating = prompt("Edit rating:", item.rating);
+  const novoNotes = prompt("Edit notes:", item.notes);
+
+  if (novoTitulo !== null) item.title = novoTitulo;
+  if (novaData !== null) item.date = novaData;
+  if (novoRating !== null) item.rating = novoRating;
+  if (novoNotes !== null) item.notes = novoNotes;
+
+  localStorage.setItem("archive", JSON.stringify(dados));
+
+  location.reload();
 }
 </script>
 
