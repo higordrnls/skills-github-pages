@@ -1,31 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Podcasts | ArchiveOne</title>
-<style>
-  body { margin: 0; background-color: #0a0a0a; color: #f5f5f5; font-family: Arial, Helvetica, sans-serif; }
-  .container { max-width: 600px; margin: 100px auto; display: flex; flex-direction: column; gap: 20px; }
-  .entry { position: relative; border-left: 1px solid #444; padding: 15px; opacity: 0.8; cursor: pointer; transition: background 0.3s ease; }
-  .entry:hover { background: #1a1a1a; }
-  .date { font-size: 12px; opacity: 0.5; }
-  .delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #f5f5f5; font-size: 18px; opacity: 0; cursor: pointer; transition: opacity 0.3s ease; z-index: 10; }
-  .entry:hover .delete-btn { opacity: 0.6; }
-  .delete-btn:hover { opacity: 1 !important; color: #ff4444; }
-  .title { font-size: 18px; margin-top: 5px; font-weight: bold; }
-  .meta { font-size: 13px; opacity: 0.6; margin-top: 4px; }
-  .notes { font-size: 14px; opacity: 0.7; margin-top: 8px; line-height: 1.4; }
-  .secondary-text { font-size: 16px; opacity: 0.6; color: #f5f5f5; text-decoration: none; }
-  .back-button { position: fixed; bottom: 30px; left: 30px; }
-</style>
+  <meta charset="UTF-8">
+  <title>Podcasts | ArchiveOne</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #0a0a0a;
+      color: #f5f5f5;
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      overflow-y: scroll;
+    }
+
+    /* ===== MENU IDÊNTICO À HOME ===== */
+    .menu {
+      position: absolute;
+      top: 30px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      z-index: 1000;
+    }
+
+    .menu a { text-decoration: none; }
+
+    .secondary-text {
+      font-size: 16px;
+      opacity: 0.6;
+      color: #f5f5f5;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .secondary-text:hover { opacity: 1; }
+
+    /* ===== CONTAINER DA LISTA ===== */
+    .container {
+      max-width: 600px;
+      margin: 150px auto 100px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+    }
+
+    h2 { 
+      font-weight: 400; 
+      font-size: 32px;
+      letter-spacing: 1px;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    .entry { 
+      text-align: left;
+      position: relative; 
+      border-left: 1px solid #444; 
+      padding: 15px; 
+      opacity: 0.8; 
+      cursor: pointer; 
+      transition: background 0.3s ease; 
+    }
+    
+    .entry:hover { background: #1a1a1a; }
+    .date { font-size: 12px; opacity: 0.5; }
+    
+    .delete-btn { 
+      position: absolute; top: 10px; right: 10px; 
+      background: none; border: none; color: #f5f5f5; 
+      font-size: 18px; opacity: 0; cursor: pointer; 
+      transition: opacity 0.3s ease; z-index: 10; 
+    }
+    
+    .entry:hover .delete-btn { opacity: 0.6; }
+    .delete-btn:hover { opacity: 1 !important; color: #ff4444; }
+    
+    .title { font-size: 18px; margin-top: 5px; font-weight: bold; }
+    .meta { font-size: 13px; opacity: 0.6; margin-top: 4px; }
+    .notes { font-size: 14px; opacity: 0.7; margin-top: 8px; line-height: 1.4; }
+
+    .back-button { position: fixed; bottom: 30px; left: 30px; }
+  </style>
 </head>
 <body>
 
-<a href="index.html" class="secondary-text back-button">← Back</a>
+  <nav class="menu">
+    <a href="articles.html" class="secondary-text">Articles</a>
+    <a href="books.html" class="secondary-text">Books</a>
+    <a href="interviews.html" class="secondary-text">Interviews</a>
+    <a href="movies.html" class="secondary-text">Movies</a>
+    <a href="podcasts.html" class="secondary-text">Podcasts</a>
+    <a href="series.html" class="secondary-text">Series</a>
+    <a href="songs.html" class="secondary-text">Songs</a>
+    <a href="tvshows.html" class="secondary-text">TV Shows</a>
+  </nav>
 
-<div class="container" id="timeline">
-  <h2>Podcasts</h2>
+  <div class="container" id="timeline">
+    <h2>Podcasts</h2>
   </div>
+
+  <a href="index.html" class="secondary-text back-button">← Back</a>
 
 <script>
 function linkify(text) {
@@ -38,7 +116,7 @@ function linkify(text) {
 
 function excluir(event, id) {
   event.stopPropagation(); 
-  if (confirm("Deseja realmente excluir?")) {
+  if (confirm("Deseja realmente excluir este podcast?")) {
     let dados = JSON.parse(localStorage.getItem("archive")) || [];
     dados = dados.filter(item => item.id !== id);
     localStorage.setItem("archive", JSON.stringify(dados));
@@ -46,36 +124,29 @@ function excluir(event, id) {
   }
 }
 
-// --- RENDERIZAÇÃO ---
 const timeline = document.getElementById("timeline");
-const dadosBrutos = localStorage.getItem("archive");
-const dados = JSON.parse(dadosBrutos) || [];
+const dados = JSON.parse(localStorage.getItem("archive")) || [];
 
-// FILTRO REFORÇADO: Comparamos ignorando maiúsculas/minúsculas para não dar erro
 const podcasts = dados.filter(item => {
     return item.category && item.category.trim().toLowerCase() === "podcasts";
 });
 
-// Ordenar por data (mais recente primeiro)
 podcasts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
 if (podcasts.length === 0) {
-    timeline.innerHTML += `<p style="opacity:0.5;">Nenhum podcast encontrado. (Total no arquivo: ${dados.length})</p>`;
-    console.log("Dados no LocalStorage:", dados); // Veja no F12 o que realmente tem lá
+    timeline.innerHTML += `<p style="opacity:0.5;">No podcasts found. (Items in total DB: ${dados.length})</p>`;
 } else {
     podcasts.forEach(item => {
         const div = document.createElement("div");
         div.classList.add("entry");
-        
         div.onclick = () => {
             localStorage.setItem("editando", item.id);
             window.location.href = "archive.html";
         };
-
         div.innerHTML = `
             <button class="delete-btn" onclick="excluir(event, ${item.id})">×</button>
-            <div class="date">${item.date || "Sem data"}</div>
-            <div class="title">${item.title || "Sem título"}</div>
+            <div class="date">${item.date || ""}</div>
+            <div class="title">${item.title || "Untitled"}</div>
             ${item.rating ? `<div class="meta">Rating: ${item.rating}/5</div>` : ""}
             ${item.notes ? `<div class="notes">${linkify(item.notes)}</div>` : ""}
         `;
