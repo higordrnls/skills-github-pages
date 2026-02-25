@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Articles | ArchiveOne</title>
+<style>
+  body { margin: 0; background-color: #0a0a0a; color: #f5f5f5; font-family: Arial, Helvetica, sans-serif; }
+  .container { max-width: 600px; margin: 100px auto; display: flex; flex-direction: column; gap: 20px; }
+  .entry { position: relative; border-left: 1px solid #444; padding: 15px; opacity: 0.8; cursor: pointer; transition: background 0.3s ease; }
+  .entry:hover { background: #1a1a1a; }
+  .date { font-size: 12px; opacity: 0.5; }
+  .delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #f5f5f5; font-size: 18px; opacity: 0; cursor: pointer; transition: opacity 0.3s ease; z-index: 10; }
+  .entry:hover .delete-btn { opacity: 0.6; }
+  .delete-btn:hover { opacity: 1 !important; color: #ff4444; }
+  .title { font-size: 18px; margin-top: 5px; font-weight: bold; }
+  .meta { font-size: 13px; opacity: 0.6; margin-top: 4px; }
+  .notes { font-size: 14px; opacity: 0.7; margin-top: 8px; line-height: 1.4; }
+  .secondary-text { font-size: 16px; opacity: 0.6; color: #f5f5f5; text-decoration: none; }
+  .back-button { position: fixed; bottom: 30px; left: 30px; }
+</style>
+</head>
+<body>
 
+<a href="index.html" class="secondary-text back-button">← Back</a>
+
+<div class="container" id="timeline">
+  <h2>Articles</h2>
+</div>
+
+<script>
+function linkify(text) {
+  if (!text) return "";
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.replace(urlRegex, function(url) {
+    return `<a href="${url}" target="_blank" style="color:#f5f5f5; text-decoration: underline;">${url}</a>`;
+  });
+}
+
+function excluir(event, id) {
+  event.stopPropagation(); 
+  if (confirm("Deseja realmente excluir este artigo?")) {
+    let dados = JSON.parse(localStorage.getItem("archive")) || [];
+    dados = dados.filter(item => item.id !== id);
+    localStorage.setItem("archive", JSON.stringify(dados));
+    location.reload();
+  }
+}
+
+// --- RENDERIZAÇÃO ESPECÍFICA PARA ARTICLES ---
+const timeline = document.getElementById("timeline");
+const dados = JSON.parse(localStorage.getItem("archive")) || [];
+
+// Filtra apenas pela categoria "Articles"
+const artigos = dados.filter(item => {
+    return item.category && item.category.trim().toLowerCase() === "articles";
+});
+
+// Orden
