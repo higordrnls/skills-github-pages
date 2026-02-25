@@ -1,19 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Archive | ArchiveOne</title>
+    <style>
+        body { margin: 0; background-color: #0a0a0a; color: #f5f5f5; font-family: Arial, Helvetica, sans-serif; }
+        .container { max-width: 600px; margin: 100px auto; display: flex; flex-direction: column; gap: 20px; }
+        h2 { font-weight: 400; }
+        .secondary-text { font-size: 16px; opacity: 0.6; color: #f5f5f5; letter-spacing: 0.5px; text-decoration: none; transition: opacity 0.3s ease; }
+        .secondary-text:hover { opacity: 1; }
+        .back-button { position: absolute; bottom: 30px; left: 30px; cursor: pointer; }
+        input, select, textarea { background-color: #0a0a0a; border: 1px solid #333; color: #f5f5f5; padding: 10px; font-family: Arial, Helvetica, sans-serif; }
+        button { background: transparent; border: 1px solid #555; color: #f5f5f5; padding: 10px; cursor: pointer; transition: all 0.3s; }
+        button:hover { background: #f5f5f5; color: #0a0a0a; }
+    </style>
+</head>
+<body>
+
+<a href="javascript:void(0)" class="secondary-text back-button" onclick="voltar()">← Back</a>
+
+<div class="container">
+    <h2 id="page-title">New Entry</h2>
+    <input id="title" type="text" placeholder="Title">
+    <select id="category">
+        <option>Articles</option>
+        <option>Books</option>
+        <option>Interviews</option>
+        <option>Movies</option>
+        <option>Podcasts</option>
+        <option>Series</option>
+        <option>Songs</option>
+        <option>TV Shows</option>
+    </select>
+    <input id="date" type="date">
+    <input id="rating" type="number" placeholder="Rating (1-5)" min="1" max="5">
+    <textarea id="notes" placeholder="Notes" rows="5"></textarea>
+    <button id="main-button" onclick="salvar()">Add to Archive</button>
+</div>
+
 <script>
-// --- LÓGICA DE CARREGAMENTO (EDITAR) ---
 window.onload = function() {
     const editandoId = localStorage.getItem("editando");
-    
     if (editandoId) {
         const dados = JSON.parse(localStorage.getItem("archive")) || [];
-        // Busca o item pelo ID (usando == para evitar erro de tipo string/number)
         const item = dados.find(i => i.id == editandoId);
-
         if (item) {
-            // Ajusta os textos da interface
             document.getElementById("page-title").innerText = "Edit Entry";
             document.getElementById("main-button").innerText = "Update Archive";
-
-            // Preenche os campos com os dados existentes
             document.getElementById("title").value = item.title || "";
             document.getElementById("category").value = item.category || "Podcasts";
             document.getElementById("date").value = item.date || "";
@@ -23,23 +56,16 @@ window.onload = function() {
     }
 };
 
-// --- LÓGICA DO BOTÃO VOLTAR (CONDICIONAL) ---
 function voltar() {
     const editandoId = localStorage.getItem("editando");
-    
-    // SEMPRE remove o ID de edição ao sair, para não bugar a próxima vez
     localStorage.removeItem("editando");
-
     if (editandoId) {
-        // Se estava editando, o histórico sabe que você veio da página de Podcasts
         window.history.back();
     } else {
-        // Se é um New Entry, força a volta para a home
         window.location.href = "index.html";
     }
 }
 
-// --- LÓGICA DE SALVAMENTO ---
 function salvar() {
     const title = document.getElementById("title").value;
     const category = document.getElementById("category").value;
@@ -52,44 +78,35 @@ function salvar() {
         return;
     }
 
-    // Pega os dados atuais ANTES de mexer neles (evita sumir com os antigos)
-    let dados = JSON.parse(localStorage.getItem("archive")) || [];
+    // AQUI ESTÁ A SEGURANÇA: Primeiro pegamos o que já existe
+    let dadosExistentes = [];
+    try {
+        dadosExistentes = JSON.parse(localStorage.getItem("archive")) || [];
+    } catch (e) {
+        console.error("Erro ao ler dados", e);
+        dadosExistentes = [];
+    }
+
     const editandoId = localStorage.getItem("editando");
 
     if (editandoId) {
-        // MODO EDIÇÃO: Atualiza o item existente
-        const index = dados.findIndex(i => i.id == editandoId);
+        const index = dadosExistentes.findIndex(i => i.id == editandoId);
         if (index !== -1) {
-            dados[index] = {
-                id: Number(editandoId),
-                title,
-                category,
-                date,
-                rating,
-                notes
-            };
+            dadosExistentes[index] = { id: Number(editandoId), title, category, date, rating, notes };
         }
     } else {
-        // MODO NOVO: Cria um novo objeto e dá um PUSH no array existente
-        const novoItem = {
-            id: Date.now(),
-            title,
-            category,
-            date,
-            rating,
-            notes
-        };
-        dados.push(novoItem);
+        const novoItem = { id: Date.now(), title, category, date, rating, notes };
+        dadosExistentes.push(novoItem);
     }
 
-    // Salva o array atualizado de volta no localStorage
-    localStorage.setItem("archive", JSON.stringify(dados));
-    localStorage.removeItem("editando"); // Limpa o estado após salvar
+    // Salva o array completo de volta
+    localStorage.setItem("archive", JSON.stringify(dadosExistentes));
+    localStorage.removeItem("editando");
 
     alert("Saved successfully!");
-
-    // Redireciona para a página da categoria
     const targetPage = category.toLowerCase().replace(/\s/g, "") + ".html";
     window.location.href = targetPage;
 }
 </script>
+</body>
+</html>
