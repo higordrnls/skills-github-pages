@@ -43,7 +43,7 @@
     /* Estilo funcional para o Login */
     .login-box { display: flex; flex-direction: column; gap: 15px; width: 250px; margin-top: 20px; }
     input { background: transparent; border: 1px solid #333; color: #fff; padding: 10px; outline: none; }
-    button { background: #f5f5f5; color: #0a0a0a; border: none; padding: 10px; font-weight: bold; cursor: pointer; }
+    button { background: #f5f5f5; color: #0a0a0a; border: none; padding: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
     
     .hidden { display: none !important; }
   </style>
@@ -73,7 +73,9 @@
 
     <div id="archive-links" class="hidden">
       <a href="archive.html" class="secondary-text">enter archive</a>
-      <p onclick="sair()" class="secondary-text" style="font-size: 10px; margin-top: 40px; opacity: 0.2; cursor: pointer;">logout</p>
+      <div style="margin-top: 40px;">
+        <button onclick="sair()" id="logout-btn">LOGOUT</button>
+      </div>
     </div>
   </div>
 
@@ -89,14 +91,14 @@
       const archiveLinks = document.getElementById('archive-links');
       const statusText = document.getElementById('status-text');
 
+      statusText.innerText = "Everything you've ever been.";
+
       if (session) {
         archiveLinks.classList.remove('hidden');
         loginForm.classList.add('hidden');
-        statusText.innerText = "Welcome back, " + session.user.email;
       } else {
         archiveLinks.classList.add('hidden');
         loginForm.classList.remove('hidden');
-        statusText.innerText = "Everything you've ever been.";
       }
     }
 
