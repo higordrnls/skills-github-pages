@@ -1,59 +1,154 @@
-// 1. Configuração inicial (IGUAL À INDEX)
-const supabaseUrl = 'https://vnablodqafeqyuxxirnn.supabase.co';
-const supabaseKey = 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR';
-const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>New Entry | ArchiveOne</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { margin: 0; background-color: #0a0a0a; color: #f5f5f5; font-family: Arial, sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { width: 100%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        h2 { font-weight: 400; letter-spacing: 1px; margin-bottom: 20px; text-align: center; }
+        input, select, textarea { background: transparent; border: 1px solid #333; color: #fff; padding: 12px; font-family: Arial; outline: none; width: 100%; box-sizing: border-box; }
+        textarea { height: 100px; resize: none; }
+        .buttons { display: flex; gap: 10px; margin-top: 10px; }
+        button { flex: 1; padding: 12px; cursor: pointer; font-weight: bold; border: none; }
+        .save-btn { background: #f5f5f5; color: #0a0a0a; }
+        .back-btn { background: transparent; color: #f5f5f5; border: 1px solid #333; }
+        .secondary-text { font-size: 14px; opacity: 0.5; text-align: center; text-decoration: none; color: #f5f5f5; margin-top: 20px; }
+    </style>
+</head>
+<body>
 
-async function salvar() {
-    // Pega a sessão para saber QUEM está salvando
-    const { data: { session } } = await _supabase.auth.getSession();
-    
-    if (!session) {
-        alert("Você precisa estar logado!");
-        window.location.href = "index.html";
-        return;
-    }
+    <div class="container">
+        <h2 id="page-title">New Entry</h2>
+        
+        <input type="text" id="title" placeholder="Title">
+        
+        <select id="category">
+            <option value="Articles">Articles</option>
+            <option value="Books">Books</option>
+            <option value="Interviews">Interviews</option>
+            <option value="Movies">Movies</option>
+            <option value="Podcasts">Podcasts</option>
+            <option value="Series">Series</option>
+            <option value="Songs">Songs</option>
+            <option value="TV Shows">TV Shows</option>
+        </select>
 
-    const title = document.getElementById("title").value;
-    const category = document.getElementById("category").value;
-    const date = document.getElementById("date").value;
-    const rating = document.getElementById("rating").value;
-    const notes = document.getElementById("notes").value;
+        <input type="date" id="date">
+        
+        <select id="rating">
+            <option value="">Rating (Optional)</option>
+            <option value="1">1/5</option>
+            <option value="2">2/5</option>
+            <option value="3">3/5</option>
+            <option value="4">4/5</option>
+            <option value="5">5/5</option>
+        </select>
 
-    if (!title) {
-        alert("Please enter a title.");
-        return;
-    }
+        <textarea id="notes" placeholder="Notes, lyrics or thoughts..."></textarea>
 
-    const editandoId = localStorage.getItem("editando");
+        <div class="buttons">
+            <button class="back-btn" onclick="voltar()">Back</button>
+            <button class="save-btn" onclick="salvar()">Add to Archive</button>
+        </div>
+    </div>
 
-    if (editandoId) {
-        // UPDATE no SQL
-        const { error } = await _supabase
-            .from('archive')
-            .update({ title, category, entry_date: date, rating, notes })
-            .eq('id', editandoId);
-        if (error) alert(error.message);
-    } else {
-        // INSERT no SQL
-        const { error } = await _supabase
-            .from('archive')
-            .insert([{ 
-                id: Date.now(), 
-                user_id: session.user.id, // VINCULA AO USUÁRIO LOGADO
-                title, 
-                category, 
-                entry_date: date, 
-                rating, 
-                notes 
-            }]);
-        if (error) alert(error.message);
-    }
+    <script>
+        // CONFIGURAÇÃO SUPABASE
+        const supabaseUrl = 'https://vnablodqafeqyuxxirnn.supabase.co';
+        const supabaseKey = 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    localStorage.removeItem("editando");
-    alert("Saved successfully to Cloud!");
-    window.location.href = category.toLowerCase().replace(/\s/g, "") + ".html";
-}
+        // AO CARREGAR A PÁGINA
+        window.onload = async () => {
+            const editandoId = localStorage.getItem("editando");
+            if (editandoId) {
+                document.getElementById("page-title").innerText = "Edit Entry";
+                // Busca os dados no banco para preencher os campos
+                const { data, error } = await _supabase
+                    .from('archive')
+                    .select('*')
+                    .eq('id', editandoId)
+                    .single();
+                
+                if (data) {
+                    document.getElementById("title").value = data.title;
+                    document.getElementById("category").value = data.category;
+                    document.getElementById("date").value = data.entry_date;
+                    document.getElementById("rating").value = data.rating || "";
+                    document.getElementById("notes").value = data.notes;
+                }
+            }
+        };
 
-function voltar() {
-    window.history.back();
-}
+        async function salvar() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            
+            if (!session) {
+                alert("Sessão expirada. Faça login novamente.");
+                window.location.href = "index.html";
+                return;
+            }
+
+            const title = document.getElementById("title").value;
+            const category = document.getElementById("category").value;
+            const date = document.getElementById("date").value;
+            const rating = document.getElementById("rating").value;
+            const notes = document.getElementById("notes").value;
+
+            if (!title) {
+                alert("Please enter a title.");
+                return;
+            }
+
+            const editandoId = localStorage.getItem("editando");
+
+            if (editandoId) {
+                // ATUALIZAR
+                const { error } = await _supabase
+                    .from('archive')
+                    .update({ 
+                        title, 
+                        category, 
+                        entry_date: date, 
+                        rating: rating ? parseInt(rating) : null, 
+                        notes 
+                    })
+                    .eq('id', editandoId);
+
+                if (error) alert("Error updating: " + error.message);
+                else finalizar();
+            } else {
+                // INSERIR NOVO
+                const { error } = await _supabase
+                    .from('archive')
+                    .insert([{ 
+                        id: Date.now(), 
+                        user_id: session.user.id,
+                        title, 
+                        category, 
+                        entry_date: date, 
+                        rating: rating ? parseInt(rating) : null, 
+                        notes 
+                    }]);
+
+                if (error) alert("Error saving: " + error.message);
+                else finalizar();
+            }
+        }
+
+        function finalizar() {
+            localStorage.removeItem("editando");
+            alert("Saved to Cloud!");
+            const cat = document.getElementById("category").value;
+            window.location.href = cat.toLowerCase().replace(/\s/g, "") + ".html";
+        }
+
+        function voltar() {
+            localStorage.removeItem("editando");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
