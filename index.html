@@ -2,92 +2,91 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>ArchiveOne</title>
-
+  <title>ArchiveOne | Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body {
-      margin: 0;
-      background-color: #0a0a0a;
-      color: #f5f5f5;
-      font-family: Arial, Helvetica, sans-serif;
-      height: 100vh;
-    }
-
-    /* ===== MENU ===== */
-    .menu {
-      position: absolute;
-      top: 30px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 60px;
-    }
-
-    .menu a {
-      text-decoration: none;
-    }
-
-    /* ===== CONTEÚDO CENTRAL ===== */
-    .container {
-      text-align: center;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-
-    h1 {
-      font-size: 48px;
-      letter-spacing: 2px;
-      margin-bottom: 10px;
-    }
-
-    /* 🔥 TIPOGRAFIA SECUNDÁRIA PADRONIZADA */
-    .secondary-text {
-      font-size: 16px;
-      opacity: 0.6;
-      color: #f5f5f5;
-      letter-spacing: 0.5px;
-      text-decoration: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .secondary-text:hover {
-      opacity: 1;
-    }
+    body { margin: 0; background-color: #0a0a0a; color: #f5f5f5; font-family: Arial, sans-serif; height: 100vh; }
+    .container { text-align: center; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+    h1 { font-size: 48px; letter-spacing: 2px; margin-bottom: 10px; }
+    .secondary-text { font-size: 16px; opacity: 0.6; color: #f5f5f5; letter-spacing: 0.5px; text-decoration: none; transition: opacity 0.3s ease; }
+    .secondary-text:hover { opacity: 1; }
+    
+    /* ESTILO DOS CAMPOS DE LOGIN */
+    .login-box { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; width: 250px; }
+    input { background: transparent; border: 1px solid #333; color: #fff; padding: 10px; font-family: Arial; }
+    button { background: #f5f5f5; color: #0a0a0a; border: none; padding: 10px; cursor: pointer; font-weight: bold; }
+    .hidden { display: none !important; }
   </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const supabaseUrl = 'https://vnablodqafeqyuxxirnn.supabase.co';
-  const supabaseKey = 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR';
-  const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
-</script>
-
 </head>
-
 <body>
 
-  <!-- MENU SUPERIOR -->
-  <nav class="menu">
-    <a href="articles.html" class="secondary-text">Articles</a>
-    <a href="books.html" class="secondary-text">Books</a>
-    <a href="interviews.html" class="secondary-text">Interviews</a>
-    <a href="movies.html" class="secondary-text">Movies</a>
-    <a href="podcasts.html" class="secondary-text">Podcasts</a>
-    <a href="series.html" class="secondary-text">Series</a>
-    <a href="songs.html" class="secondary-text">Songs</a>
-    <a href="tvshows.html" class="secondary-text">TV Shows</a>
-  </nav>
-
-  <!-- CONTEÚDO CENTRAL -->
   <div class="container">
     <h1>ArchiveOne</h1>
-    <p class="secondary-text">Everything you've ever been.</p>
-    <a href="archive.html" class="secondary-text">enter archive</a>
+    <p class="secondary-text" id="status-text">Everything you've ever been.</p>
+
+    <div id="login-form" class="login-box">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="pass" placeholder="Password">
+      <button onclick="entrar()">Login</button>
+    </div>
+
+    <div id="archive-link" class="hidden">
+      <a href="archive.html" class="secondary-text">enter archive</a>
+      <br><br>
+      <a href="#" onclick="sair()" class="secondary-text" style="font-size: 12px;">logout</a>
+    </div>
   </div>
 
+  <script>
+    // Configuração
+    const supabaseUrl = 'https://vnablodqafeqyuxxirnn.supabase.co';
+    const supabaseKey = 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // 1. FUNÇÃO PARA LOGAR
+    async function entrar() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('pass').value;
+
+      const { data, error } = await _supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        alert("Erro: " + error.message);
+      } else {
+        alert("Logado com sucesso!");
+        verificarSessao();
+      }
+    }
+
+    // 2. VERIFICAR SE ESTÁ LOGADO
+    async function verificarSessao() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      
+      const loginForm = document.getElementById('login-form');
+      const archiveLink = document.getElementById('archive-link');
+      const statusText = document.getElementById('status-text');
+
+      if (session) {
+        loginForm.classList.add('hidden');
+        archiveLink.classList.remove('hidden');
+        statusText.innerText = "Welcome back, " + session.user.email;
+      } else {
+        loginForm.classList.remove('hidden');
+        archiveLink.classList.add('hidden');
+      }
+    }
+
+    // 3. LOGOUT
+    async function sair() {
+      await _supabase.auth.signOut();
+      location.reload();
+    }
+
+    // Executa ao abrir a página
+    window.onload = verificarSessao;
+  </script>
 </body>
 </html>
