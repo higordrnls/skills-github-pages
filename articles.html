@@ -1,64 +1,62 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // 1. Conexão (Sempre a mesma)
-const supabaseUrl = 'https://vnablodqafeqyuxxirnn.supabase.co';
-const supabaseKey = 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR';
-const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // 2. Configurações (Declaradas UMA ÚNICA VEZ)
+    const supabaseUrl = 'https://vnablodqafeqyuxxirnn.supabase.co';
+    const supabaseKey = 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-async function carregarDados() {
-    const timeline = document.getElementById("timeline");
+    async function carregarDados() {
+        const timeline = document.getElementById("timeline");
+        
+        // Verifica se o usuário tá logado
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) {
+            window.location.href = "index.html";
+            return;
+        }
 
-    // Pega quem está logado
-    const { data: { session } } = await _supabase.auth.getSession();
-    if (!session) {
-        window.location.href = "index.html";
-        return;
+        // Busca no Supabase
+        const { data: itens, error } = await _supabase
+            .from('archive')
+            .select('*')
+            .eq('category', 'Articles') // Se for mudar de página, mude só esse nome
+            .eq('user_id', session.user.id)
+            .order('entry_date', { ascending: false });
+
+        if (error) {
+            console.error("Erro no banco:", error.message);
+            return;
+        }
+
+        // Limpa a div antes de renderizar
+        timeline.innerHTML = "";
+
+        if (!itens || itens.length === 0) {
+            timeline.innerHTML = `<p style="opacity:0.3; text-align:center; margin-top:50px;">No entries found.</p>`;
+        } else {
+            itens.forEach(item => {
+                const div = document.createElement("div");
+                div.classList.add("entry");
+                div.style.cursor = "pointer";
+                
+                // Clique para editar
+                div.onclick = () => {
+                    localStorage.setItem("editando", item.id);
+                    window.location.href = "archive.html";
+                };
+
+                div.innerHTML = `
+                    <div class="date">${item.entry_date || ""}</div>
+                    <div class="title" style="font-weight:bold;">${item.title}</div>
+                    ${item.rating ? `<div class="meta">${item.rating}/5</div>` : ""}
+                    ${item.notes ? `<div class="notes">${item.notes}</div>` : ""}
+                `;
+                timeline.appendChild(div);
+            });
+        }
     }
 
-    // BUSCA NO SUPABASE: Filtra por Usuário e pela Categoria 'Articles'
-    const { data: itens, error } = await _supabase
-        .from('archive')
-        .select('*')
-        .eq('category', 'Articles') // <--- MUDE ISSO em cada página (Movies, Books, etc.)
-        .eq('user_id', session.user.id)
-        .order('entry_date', { ascending: false });
-
-    if (error) {
-        console.error("Erro:", error.message);
-        return;
-    }
-
-    // Limpa a timeline antes de mostrar os novos dados
-    timeline.innerHTML = "";
-
-    if (itens.length === 0) {
-        timeline.innerHTML = `<p style="opacity:0.3; text-align:center; margin-top:50px;">No entries found in this category.</p>`;
-    } else {
-        itens.forEach(item => {
-            const div = document.createElement("div");
-            div.classList.add("entry");
-            
-            // Quando clicar, ele salva o ID no localStorage pra gente saber qual editar no archive.html
-            div.onclick = () => {
-                localStorage.setItem("editando", item.id);
-                window.location.href = "archive.html";
-            };
-
-            div.innerHTML = `
-                <div class="date">${item.entry_date || ""}</div>
-                <div class="title">${item.title}</div>
-                ${item.rating ? `<div class="meta">${item.rating}/5</div>` : ""}
-                ${item.notes ? `<div class="notes">${item.notes}</div>` : ""}
-            `;
-            timeline.appendChild(div);
-        });
-    }
-}
-
-// Inicia a busca assim que a página abre
-window.onload = carregarDados;
-  const supabaseUrl = 'https://vnablodqafeqyuxxirnn.supabase.co';
-  const supabaseKey = 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR';
-  // ... resto do código ...
+    // 3. O ÚNICO gatilho necessário
+    window.onload = carregarDados;
 </script>
