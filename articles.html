@@ -130,7 +130,7 @@ const timeline = document.getElementById("timeline");
 const { data: dados, error } = await supabase
   .from('archive')
   .select('*')
-  .eq('category', 'Articles'); // ou 'Movies', 'Books', etc.
+  .eq('category', 'articles'); // ou 'Movies', 'Books', etc.
 const artigos = dados.filter(item => {
     return item.category && item.category.trim().toLowerCase() === "articles";
 });
