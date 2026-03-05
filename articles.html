@@ -126,8 +126,11 @@ function excluir(event, id) {
 }
 
 const timeline = document.getElementById("timeline");
-const dados = JSON.parse(localStorage.getItem("archive")) || [];
-
+// Depois (SQL):
+const { data: dados, error } = await supabase
+  .from('archive')
+  .select('*')
+  .eq('category', 'Articles'); // ou 'Movies', 'Books', etc.
 const artigos = dados.filter(item => {
     return item.category && item.category.trim().toLowerCase() === "articles";
 });
