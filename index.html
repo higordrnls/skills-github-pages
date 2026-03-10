@@ -10,7 +10,7 @@
     /* MENU SUPERIOR */
     .menu { position: absolute; top: 30px; width: 100%; display: flex; justify-content: center; gap: 60px; z-index: 1000; }
 
-    /* ÁREA DE PERFIL (LOGADO) */
+    /* ÁREA DE PERFIL */
     .profile-area { position: absolute; top: 25px; right: 30px; z-index: 1100; display: flex; align-items: center; gap: 15px; }
     .icon-btn { cursor: pointer; opacity: 0.6; transition: opacity 0.3s; display: flex; align-items: center; }
     .icon-btn:hover { opacity: 1; }
@@ -22,7 +22,6 @@
     }
     .profile-trigger img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* MODAL DE DADOS */
     .profile-modal {
       position: absolute; top: 55px; right: 0; width: 280px; background: #0f0f0f; border: 1px solid #333;
       padding: 25px; display: none; flex-direction: column; gap: 12px; text-align: left;
@@ -35,55 +34,51 @@
     /* CONTAINER CENTRAL */
     .container { text-align: center; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     h1 { font-size: 48px; letter-spacing: 2px; margin-bottom: 10px; }
-    
     .secondary-text { font-size: 16px; opacity: 0.6; color: #f5f5f5; letter-spacing: 0.5px; text-decoration: none; transition: opacity 0.3s ease; }
     .secondary-text:hover { opacity: 1; }
 
-    /* FORMULÁRIO DE LOGIN */
+    /* LOGIN */
     .login-box { display: flex; flex-direction: column; gap: 15px; width: 250px; margin-top: 20px; }
     .login-box input { background: transparent !important; border: 1px solid #333; color: #fff; padding: 10px; outline: none; font-size: 14px; }
-    .login-box input:focus { border-color: #666; }
-
     .btn-login { background: #f5f5f5; color: #0a0a0a; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; width: 100%; }
     .btn-register { background: transparent; color: #f5f5f5; border: 1px solid #333; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: inline-block; font-size: 14px; margin-top: 5px; text-align: center; }
 
-    /* TIMELINE (LINHA VERMELHA) */
+    /* TIMELINE DINÂMICA */
     .timeline-wrapper {
-      position: absolute;
-      bottom: 85px; /* Altura da sua linha vermelha */
-      width: 100%;
-      overflow-x: auto;
-      padding: 20px 0;
-      white-space: nowrap;
-      scrollbar-width: none;
-      z-index: 500;
+      position: absolute; bottom: 85px; width: 100%;
+      overflow-x: auto; padding: 30px 0; white-space: nowrap;
+      scrollbar-width: none; z-index: 500;
     }
     .timeline-wrapper::-webkit-scrollbar { display: none; }
-
-    .timeline-line {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      width: 2500px; /* Extensão da linha horizontal */
-      height: 1px;
-      background: rgba(245, 245, 245, 0.1);
-      z-index: 1;
+    .timeline-line { position: absolute; top: 50%; left: 0; width: 5000px; height: 1px; background: rgba(245, 245, 245, 0.1); z-index: 1; }
+    
+    .timeline-items { 
+      display: inline-flex; 
+      gap: var(--timeline-gap, 120px); 
+      padding: 0 50vw; 
+      position: relative; 
+      z-index: 2; 
+      transition: gap 0.2s ease; 
     }
-
-    .timeline-items { display: inline-flex; gap: 120px; padding: 0 50vw; position: relative; z-index: 2; }
 
     .timeline-node { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.3s; }
     .node-dot { width: 6px; height: 6px; background: #333; border-radius: 50%; margin-bottom: 12px; transition: 0.3s; }
-    .node-year { font-size: 11px; letter-spacing: 1px; opacity: 0.3; transition: 0.3s; text-transform: uppercase; }
+    .node-year { font-size: 10px; letter-spacing: 1px; opacity: 0.3; transition: 0.3s; text-transform: uppercase; text-align: center; line-height: 1.2; }
 
-    .timeline-node:hover .node-dot { background: #666; }
-    .timeline-node.active .node-dot { background: #f5f5f5; transform: scale(1.6); box-shadow: 0 0 10px rgba(255,255,255,0.4); }
+    /* Brilho para dias com conteúdo */
+    .node-dot.has-content { 
+      background: #f5f5f5 !important; 
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8); 
+      width: 8px; height: 8px;
+    }
+
+    .timeline-node.active .node-dot { background: #f5f5f5; transform: scale(1.6); }
     .timeline-node.active .node-year { opacity: 1; font-weight: bold; }
 
     .hidden { display: none !important; }
   </style>
 </head>
-<body>
+<body onwheel="handleTimelineScroll(event)">
 
   <nav class="menu">
     <a href="articles.html" class="secondary-text">Articles</a>
@@ -106,7 +101,7 @@
         <h3>Personal Data</h3>
         <input type="text" id="prof-name" placeholder="Full Name">
         <input type="text" id="prof-cpf" placeholder="CPF">
-        <input type="text" id="prof-birth" placeholder="Data de Nascimento (Ex: 01/01/2000)">
+        <input type="text" id="prof-birth" placeholder="Data de Nascimento">
         <input type="tel" id="prof-phone" placeholder="Phone">
         <input type="email" id="prof-email" placeholder="Email" disabled>
         <input type="password" id="prof-new-pass" placeholder="New Password">
@@ -132,23 +127,13 @@
 
   <div class="timeline-wrapper hidden" id="timeline-area">
     <div class="timeline-line"></div>
-    <div class="timeline-items">
-      <div class="timeline-node" onclick="selectNode(this)"><div class="node-dot"></div><span class="node-year">2021</span></div>
-      <div class="timeline-node" onclick="selectNode(this)"><div class="node-dot"></div><span class="node-year">2022</span></div>
-      <div class="timeline-node" onclick="selectNode(this)"><div class="node-dot"></div><span class="node-year">2023</span></div>
-      <div class="timeline-node" onclick="selectNode(this)"><div class="node-dot"></div><span class="node-year">2024</span></div>
-      <div class="timeline-node active" onclick="selectNode(this)"><div class="node-dot"></div><span class="node-year">Now</span></div>
-      <div class="timeline-node" onclick="selectNode(this)"><div class="node-dot"></div><span class="node-year">Future</span></div>
-    </div>
+    <div class="timeline-items" id="timeline-content"></div>
   </div>
 
   <script>
     const _supabase = supabase.createClient('https://vnablodqafeqyuxxirnn.supabase.co', 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR');
-
-    function selectNode(el) {
-      document.querySelectorAll('.timeline-node').forEach(n => n.classList.remove('active'));
-      el.classList.add('active');
-    }
+    let currentZoom = 120;
+    let userLogs = [];
 
     async function verificarSessao() {
       const { data: { session } } = await _supabase.auth.getSession();
@@ -159,10 +144,61 @@
         document.getElementById('login-form').classList.add('hidden');
         document.getElementById('prof-email').value = session.user.email;
         carregarDadosPerfil(session.user.id);
+        carregarRegistrosTimeline(session.user.id);
       } else {
         document.getElementById('login-form').classList.remove('hidden');
-        document.getElementById('timeline-area').classList.add('hidden');
       }
+    }
+
+    async function carregarRegistrosTimeline(userId) {
+      const tabelas = ['books', 'movies', 'songs', 'articles', 'podcasts', 'series', 'tvshows'];
+      let todasDatas = [];
+      for (const t of tabelas) {
+        const { data } = await _supabase.from(t).select('created_at').eq('user_id', userId);
+        if (data) data.forEach(r => todasDatas.push(new Date(r.created_at).toISOString().split('T')[0]));
+      }
+      userLogs = [...new Set(todasDatas)];
+      renderTimelineItems();
+    }
+
+    function handleTimelineScroll(e) {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        currentZoom += e.deltaY * -0.8;
+        currentZoom = Math.min(Math.max(60, currentZoom), 1200);
+        document.getElementById('timeline-content').style.setProperty('--timeline-gap', currentZoom + 'px');
+        renderTimelineItems();
+      }
+    }
+
+    function renderTimelineItems() {
+      const container = document.getElementById('timeline-content');
+      let html = '';
+      const hoje = new Date();
+
+      if (currentZoom < 400) {
+        for (let i = -3; i <= 1; i++) {
+          const ano = hoje.getFullYear() + i;
+          html += `<div class="timeline-node" onclick="selectNode(this)"><div class="node-dot"></div><span class="node-year">${ano}</span></div>`;
+        }
+      } else {
+        for (let i = -20; i <= 5; i++) {
+          const d = new Date(); d.setDate(hoje.getDate() + i);
+          const iso = d.toISOString().split('T')[0];
+          const label = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+          const temConteudo = userLogs.includes(iso);
+          html += `<div class="timeline-node ${i === 0 ? 'active' : ''}" onclick="selectNode(this)">
+                    <div class="node-dot ${temConteudo ? 'has-content' : ''}"></div>
+                    <span class="node-year">${label}${i === 0 ? '<br>HOJE' : ''}</span>
+                  </div>`;
+        }
+      }
+      container.innerHTML = html;
+    }
+
+    function selectNode(el) {
+      document.querySelectorAll('.timeline-node').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
     }
 
     async function carregarDadosPerfil(userId) {
@@ -179,13 +215,10 @@
     async function uploadFoto(input) {
       const file = input.files[0]; if (!file) return;
       const { data: { session } } = await _supabase.auth.getSession();
-      const { error } = await _supabase.storage.from('avatars').upload(session.user.id, file, { upsert: true });
-      if (error) alert("Erro: " + error.message);
-      else {
-        const { data: urlData } = _supabase.storage.from('avatars').getPublicUrl(session.user.id);
-        await _supabase.from('profiles').upsert({ id: session.user.id, avatar_url: urlData.publicUrl });
-        location.reload();
-      }
+      await _supabase.storage.from('avatars').upload(session.user.id, file, { upsert: true });
+      const { data: urlData } = _supabase.storage.from('avatars').getPublicUrl(session.user.id);
+      await _supabase.from('profiles').upsert({ id: session.user.id, avatar_url: urlData.publicUrl });
+      location.reload();
     }
 
     async function salvarTudo() {
