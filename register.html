@@ -3,48 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <title>Register | ArchiveOne</title>
-  <style>
-    body { margin: 0; background-color: #0a0a0a; color: #f5f5f5; font-family: Arial, Helvetica, sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
-    .login-container { width: 300px; }
-    h1 { font-weight: 400; font-size: 32px; letter-spacing: 2px; margin-bottom: 40px; opacity: 0.9; }
-    input { width: 100%; padding: 12px 0; margin-bottom: 20px; background: transparent; border: none; border-bottom: 1px solid #333; color: #f5f5f5; font-size: 16px; outline: none; transition: border-color 0.3s; }
-    input:focus { border-bottom-color: #f5f5f5; }
-    button { width: 100%; padding: 12px; background: transparent; border: 1px solid #333; color: #f5f5f5; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: all 0.3s; margin-top: 20px; }
-    button:hover { background: #f5f5f5; color: #0a0a0a; }
-    .back { display: block; margin-top: 20px; font-size: 12px; opacity: 0.4; color: #f5f5f5; text-decoration: none; transition: opacity 0.3s; }
-    .back:hover { opacity: 1; }
-  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { margin: 0; background-color: #0a0a0a; color: #f5f5f5; font-family: Arial, Helvetica, sans-serif; height: 100vh; }
+    
+    .container {
+      text-align: center;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    h1 { font-size: 48px; letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; }
+
+    .secondary-text {
+      font-size: 16px;
+      opacity: 0.6;
+      color: #f5f5f5;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      transition: opacity 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    .login-box { display: flex; flex-direction: column; gap: 15px; width: 250px; margin-top: 20px; }
+    
+    input { background: transparent; border: 1px solid #333; color: #fff; padding: 10px; outline: none; font-size: 14px; }
+    input:focus { border-color: #666; }
+
+    .btn-style { 
+      background: #f5f5f5; 
+      color: #0a0a0a; 
+      border: none; 
+      padding: 12px; 
+      font-weight: bold; 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      transition: opacity 0.3s; 
+    }
+    .btn-style:hover { opacity: 0.9; }
+
+    .back-link { 
+      display: block; 
+      margin-top: 15px; 
+      font-size: 14px; 
+      opacity: 0.4; 
+      color: #f5f5f5; 
+      text-decoration: none; 
+      transition: opacity 0.3s; 
+    }
+    .back-link:hover { opacity: 1; }
+  </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <h1>REGISTER</h1>
-    <input type="email" id="email" placeholder="email">
-    <input type="password" id="password" placeholder="password">
-    <button onclick="registrar()">CREATE ACCOUNT</button>
-    <a href="index.html" class="back">← back to login</a>
+  <div class="container">
+    <h1>Register</h1>
+    <p class="secondary-text">Create your archive.</p>
+
+    <div class="login-box">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="pass" placeholder="Password">
+      <button class="btn-style" onclick="registrar()">Create Account</button>
+      <a href="index.html" class="back-link">← back to login</a>
+    </div>
   </div>
 
-<script>
-const _supabase = supabase.createClient('https://vnablodqafeqyuxxirnn.supabase.co', 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR');
+  <script>
+    const _supabase = supabase.createClient('https://vnablodqafeqyuxxirnn.supabase.co', 'sb_publishable_4uMYsIDc2Q9Cra31y8TOYg_q-RCGVYR');
 
-async function registrar() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    async function registrar() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('pass').value;
 
-    const { data, error } = await _supabase.auth.signUp({
+      const { data, error } = await _supabase.auth.signUp({
         email: email,
         password: password,
-    });
+      });
 
-    if (error) {
-        alert("Erro: " + error.message);
-    } else {
-        alert("Sucesso! Verifique seu e-mail para confirmar o cadastro (se habilitado no Supabase) ou tente logar.");
+      if (error) {
+        alert("Error: " + error.message);
+      } else {
+        alert("Success! Account created. You can now login.");
         window.location.href = "index.html";
+      }
     }
-}
-</script>
+  </script>
 </body>
 </html>
