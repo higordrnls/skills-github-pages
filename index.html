@@ -5,7 +5,6 @@
   <title>ArchiveOne</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* ===== CSS ORIGINAL (SEM ALTERAÇÕES DE DESIGN) ===== */
     body { margin: 0; background-color: #0a0a0a; color: #f5f5f5; font-family: Arial, Helvetica, sans-serif; height: 100vh; }
     
     .menu {
@@ -40,12 +39,20 @@
 
     .secondary-text:hover { opacity: 1; }
 
-    /* Estilo funcional para o Login */
     .login-box { display: flex; flex-direction: column; gap: 15px; width: 250px; margin-top: 20px; }
-    input { background: transparent; border: 1px solid #333; color: #fff; padding: 10px; outline: none; }
-    button { background: #f5f5f5; color: #0a0a0a; border: none; padding: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+    
+    input { background: transparent; border: 1px solid #333; color: #fff; padding: 10px; outline: none; font-size: 14px; }
+    input:focus { border-color: #666; }
+
+    button { background: #f5f5f5; color: #0a0a0a; border: none; padding: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: opacity 0.3s; }
+    button:hover { opacity: 0.9; }
+
+    .register-link { display: block; margin-top: 15px; font-size: 14px; opacity: 0.4; color: #f5f5f5; text-decoration: none; transition: opacity 0.3s; }
+    .register-link:hover { opacity: 1; }
 
     .hidden { display: none !important; }
+    
+    #logout-btn { background: #f5f5f5; margin-top: 20px; width: 100px; }
   </style>
 </head>
 <body>
@@ -69,6 +76,7 @@
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="pass" placeholder="Password">
       <button onclick="entrar()">Login</button>
+      <a href="register.html" class="register-link">register</a>
     </div>
 
     <div id="archive-links" class="hidden">
@@ -89,9 +97,6 @@
       
       const loginForm = document.getElementById('login-form');
       const archiveLinks = document.getElementById('archive-links');
-      const statusText = document.getElementById('status-text');
-
-      statusText.innerText = "Everything you've ever been.";
 
       if (session) {
         archiveLinks.classList.remove('hidden');
