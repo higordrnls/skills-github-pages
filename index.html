@@ -15,20 +15,21 @@
     h1 { font-size: 48px; letter-spacing: 2px; margin-bottom: 10px; }
     .secondary-text { font-size: 16px; opacity: 0.6; color: #f5f5f5; letter-spacing: 0.5px; text-decoration: none; border: none !important; }
 
-    /* TIMELINE WRAPPER - Aumentei o padding superior para o card aparecer */
+    /* TIMELINE WRAPPER - Ajustado para o card não cortar */
     .timeline-wrapper { 
       position: absolute; bottom: 0; width: 100%; 
-      height: 250px; /* Altura fixa para conter o card */
-      overflow-x: auto; overflow-y: visible; /* Permitir que o card suba */
+      height: 350px; /* Aumentado para garantir espaço do card */
+      overflow-x: auto; overflow-y: visible;
       scrollbar-width: none; z-index: 500; cursor: grab; user-select: none; 
     }
     .timeline-wrapper::-webkit-scrollbar { display: none; }
     
-    .timeline-line { position: absolute; top: 70%; left: 0; width: 10000px; height: 1px; background: rgba(245, 245, 245, 0.1); z-index: 1; }
+    /* LINHA DE FUNDO - Estendida */
+    .timeline-line { position: absolute; top: 80%; left: 0; width: 20000px; height: 1px; background: rgba(245, 245, 245, 0.1); z-index: 1; }
     
     .timeline-items { 
       display: inline-flex; gap: var(--timeline-gap, 120px); 
-      padding: 0 50vw; position: relative; top: 70%; transform: translateY(-50%);
+      padding: 0 50vw; position: relative; top: 80%; transform: translateY(-50%);
       z-index: 2; transition: gap 0.1s ease-out; 
     }
 
@@ -38,26 +39,26 @@
 
     .node-dot.has-content { background: #f5f5f5 !important; box-shadow: 0 0 12px rgba(255, 255, 255, 0.8); width: 8px; height: 8px; }
 
-    /* CARD DESIGN - Ajustado para não ser cortado */
+    /* CARD DESIGN */
     .info-card {
       position: absolute; 
-      bottom: 60px; /* Distância da bolinha */
+      bottom: 70px; /* Subido para não cortar */
       background: #0f0f0f; border: 1px solid #333;
-      padding: 15px; width: 180px; white-space: normal; 
+      padding: 15px; width: 200px; white-space: normal; 
       display: none; flex-direction: column; gap: 6px; 
       pointer-events: none; text-align: left;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
       z-index: 2000;
     }
     /* LINHA CONECTORA */
     .info-card::after { 
-      content: ''; position: absolute; bottom: -45px; left: 50%; 
-      width: 1px; height: 45px; background: #f5f5f5; opacity: 0.4; 
+      content: ''; position: absolute; bottom: -55px; left: 50%; 
+      width: 1px; height: 55px; background: #f5f5f5; opacity: 0.4; 
     }
     
     .timeline-node.active .info-card { display: flex; }
-    .card-title { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #f5f5f5; margin-bottom: 4px; display: block; }
-    .card-item { font-size: 10px; opacity: 0.5; display: block; }
+    .card-title { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #f5f5f5; margin-bottom: 4px; display: block; border-bottom: 1px solid #222; padding-bottom: 4px; }
+    .card-item { font-size: 10px; opacity: 0.7; display: block; line-height: 1.4; }
 
     .timeline-node.active .node-dot { background: #f5f5f5; transform: scale(1.6); }
     .timeline-node.active .node-year { opacity: 1; font-weight: bold; }
@@ -131,9 +132,11 @@
       for (const t of tabelas) {
         const { data } = await _supabase.from(t).select('title, created_at').eq('user_id', userId);
         if (data) data.forEach(r => {
-          const d = new Date(r.created_at).toISOString().split('T')[0];
-          if (!logsByDate[d]) logsByDate[d] = [];
-          logsByDate[d].push(r.title);
+          // Normalização da data para evitar erros de fuso horário/horário
+          const d = new Date(r.created_at);
+          const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+          if (!logsByDate[iso]) logsByDate[iso] = [];
+          logsByDate[iso].push(r.title);
         });
       }
       renderTimelineItems();
@@ -152,15 +155,16 @@
           </div>`;
         }
       } else {
-        for (let i = -30; i <= 5; i++) {
+        // Range estendido para garantir que a linha cubra março e além
+        for (let i = -40; i <= 15; i++) {
           const d = new Date(); d.setDate(hoje.getDate() + i);
-          const iso = d.toISOString().split('T')[0];
+          const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
           const label = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
           const items = logsByDate[iso] || [];
           
           let cardHtml = `<div class="info-card">
             <span class="card-title">${d.toLocaleDateString('pt-BR')}</span>
-            ${items.length > 0 ? items.slice(0,3).map(t => `<span class="card-item">• ${t}</span>`).join('') : '<span class="card-item">Nenhum registro.</span>'}
+            ${items.length > 0 ? items.map(t => `<span class="card-item">• ${t}</span>`).join('') : '<span class="card-item" style="opacity:0.3">Nenhum registro.</span>'}
           </div>`;
 
           html += `<div class="timeline-node ${i === 0 ? 'active' : ''}" onclick="selectNode(this)">
