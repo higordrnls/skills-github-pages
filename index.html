@@ -111,10 +111,11 @@
         const { data } = await _supabase.from(t).select('title, created_at').eq('user_id', userId);
         if (data) {
           data.forEach(r => {
-            // SOLUÇÃO: Pega a string pura "YYYY-MM-DD" e ignora qualquer objeto Date
+            // Pega apenas a data YYYY-MM-DD ignorando fuso
             const iso = r.created_at.substring(0, 10);
             if (!logsByDate[iso]) logsByDate[iso] = [];
-            logsByDate[iso].push(`${t.toUpperCase()}: ${r.title}`);
+            // Mostra apenas o título, sem a categoria
+            logsByDate[iso].push(r.title);
           });
         }
       }
@@ -124,15 +125,18 @@
     function renderTimelineItems() {
       const container = document.getElementById('timeline-content');
       let html = '';
-      const hoje = new Date();
+      
+      // Criar a data base em UTC para evitar problemas de fuso
+      const agora = new Date();
+      const hojeUTC = new Date(Date.UTC(agora.getFullYear(), agora.getMonth(), agora.getDate()));
       
       for (let i = -60; i <= 20; i++) {
-        const d = new Date(); d.setDate(hoje.getDate() + i);
+        const d = new Date(hojeUTC);
+        d.setUTCDate(hojeUTC.getUTCDate() + i);
         
-        // Gera a chave ISO manual para bater com o banco sem fuso
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
+        const y = d.getUTCFullYear();
+        const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(d.getUTCDate()).padStart(2, '0');
         const isoKey = `${y}-${m}-${day}`;
         
         const items = logsByDate[isoKey] || [];
@@ -143,7 +147,7 @@
             ${items.length > 0 ? items.map(t => `<span style="font-size:10px; opacity:0.8;">• ${t}</span>`).join('') : '<span style="font-size:10px; opacity:0.3;">No records.</span>'}
           </div>
           <div class="node-dot ${items.length > 0 ? 'has-content' : ''}"></div>
-          <span class="node-year">${d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short'})}</span>
+          <span class="node-year">${day} ${d.toLocaleDateString('pt-BR', {month:'short', timeZone: 'UTC'})}</span>
         </div>`;
       }
       container.innerHTML = html;
@@ -159,7 +163,6 @@
       }
     }
 
-    // Zoom e Arrastar
     const tw = document.getElementById('timeline-area');
     tw.addEventListener('wheel', (e) => {
       e.preventDefault();
